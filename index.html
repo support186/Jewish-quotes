@@ -3,124 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GIDS VISION | Unlimited Wisdom</title>
+    <title>GIDS VISION | Sages of All Ages</title>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        :root { --accent: #4ade80; }
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Space Grotesk', sans-serif; touch-action: none; }
-        
         #capture-area { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        
-        #bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: opacity 1s; opacity: 0; background-color: #111; }
-
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px; box-sizing: border-box; }
-
-        #quote-box { max-width: 900px; width: 95%; z-index: 5; }
-        #quote-text { font-family: 'Bangers', cursive; font-size: clamp(1.5rem, 6vw, 3.2rem); color: #fff; text-shadow: 0 0 25px #000; margin-bottom: 25px; line-height: 1.1; }
-        #quote-source { font-size: clamp(0.9rem, 4vw, 1.4rem); color: #4ade80; text-transform: uppercase; letter-spacing: 5px; }
-
+        #bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: opacity 0.8s; opacity: 0; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px; box-sizing: border-box; }
+        #quote-box { max-width: 850px; width: 95%; z-index: 5; }
+        #quote-text { font-family: 'Bangers', cursive; font-size: clamp(1.4rem, 5vw, 2.8rem); color: #fff; text-shadow: 0 0 20px #000; margin-bottom: 20px; line-height: 1.2; text-transform: uppercase; }
+        #quote-source { font-size: clamp(0.8rem, 3.5vw, 1.2rem); color: var(--accent); text-transform: uppercase; letter-spacing: 4px; opacity: 0.9; }
+        .vibe-selector { position: fixed; top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; z-index: 100; width: 100%; }
+        .vibe-btn { background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; font-family: 'Bangers'; }
+        .vibe-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
         .controls { position: fixed; bottom: 30px; display: flex; gap: 15px; z-index: 100; }
-        .btn { background: #fff; color: #000; border: none; padding: 15px 30px; font-family: 'Bangers'; font-size: 1.4rem; cursor: pointer; border-radius: 50px; transition: 0.3s; box-shadow: 0 0 20px rgba(74, 222, 128, 0.5); }
-        .btn:hover { transform: scale(1.1); background: #4ade80; }
-        .btn-dl { background: #4ade80; color: #000; }
-
-        #loader { color: white; font-family: 'Bangers'; font-size: 2.2rem; letter-spacing: 2px; text-align: center; z-index: 10; }
+        .btn { background: #fff; color: #000; border: none; padding: 15px 30px; font-family: 'Bangers'; font-size: 1.4rem; cursor: pointer; border-radius: 50px; transition: 0.3s; }
+        .btn-dl { background: var(--accent); }
+        #loader { color: white; font-family: 'Bangers'; font-size: 1.8rem; text-align: center; z-index: 10; display: none; }
     </style>
 </head>
 <body>
 
+    <div class="vibe-selector">
+        <button class="vibe-btn active" onclick="setVibe('CHASSIDUT', this)">CHASSIDUT</button>
+        <button class="vibe-btn" onclick="setVibe('MODERN', this)">MODERN SAGES</button>
+        <button class="vibe-btn" onclick="setVibe('CLASSIC', this)">CLASSIC (RAMBAM)</button>
+    </div>
+
     <div id="capture-area">
         <div id="bg-image"></div>
         <div class="overlay">
-            <div id="loader">WAKING THE SAGES...</div>
-            <div id="quote-box" style="display:none;">
-                <div id="quote-text"></div>
-                <div id="quote-source"></div>
+            <div id="loader">GATHERING THE SAGES...</div>
+            <div id="quote-box">
+                <div id="quote-text">TAP NEXT TO BEGIN</div>
+                <div id="quote-source">GIDS VISION</div>
             </div>
         </div>
     </div>
 
     <div class="controls">
         <button class="btn" onclick="generateVision()">NEXT</button>
-        <button class="btn btn-dl" onclick="downloadVision()">DOWNLOAD</button>
+        <button class="btn btn-dl" onclick="downloadVision()">SAVE</button>
     </div>
 
     <script>
-        const loadingMessages = [
-            "WAKING UP THE SAGES...",
-            "POLISHING THE CROWN...",
-            "CONSULTING THE ANCIENTS...",
-            "UNROLLING THE SCROLLS...",
-            "SEARCHING FOR MEANING...",
-            "GATHERING KAVANAH...",
-            "SAGES ARE THINKING...",
-            "OPENING THE GATES..."
+        const modernSages = [
+            { text: "A people is as great as the ideals it survives for.", ref: "Rabbi Lord Jonathan Sacks" },
+            { text: "To be a Jew is to be an agent of hope in a world serially threatened by despair.", ref: "Rabbi Jonathan Sacks" },
+            { text: "The opposite of love is not hate, it’s indifference.", ref: "Elie Wiesel" },
+            { text: "Halakha is a multi-dimensional approach to reality.", ref: "Rabbi Joseph B. Soloveitchik" },
+            { text: "A man is what he does, not what he says.", ref: "The Lubavitcher Rebbe" },
+            { text: "If you want to change the world, start with yourself.", ref: "The Baal Shem Tov" },
+            { text: "It is a great mitzvah to be happy always.", ref: "Rebbe Nachman of Breslov" }
         ];
 
-        // Wide list of books to ensure variety
-        const categories = ["Pirkei_Avot", "Psalms", "Proverbs", "Ecclesiastes"];
+        const vibeBooks = {
+            'CHASSIDUT': ['Likutei_Moharan', 'Noam_Elimelech', 'Kedushat_Levi', 'Tanya'],
+            'CLASSIC': ['Mishneh_Torah%2C_Foundations_of_the_Torah', 'Guide_for_the_Perplexed', 'Ramban_on_Torah']
+        };
+
+        let currentVibe = 'CHASSIDUT';
         let startX = 0;
+
+        function setVibe(v, btn) {
+            currentVibe = v;
+            document.querySelectorAll('.vibe-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            generateVision();
+        }
+
+        async function fetchQuote() {
+            if (currentVibe === 'MODERN') {
+                return modernSages[Math.floor(Math.random() * modernSages.length)];
+            }
+
+            const books = vibeBooks[currentVibe];
+            const book = books[Math.floor(Math.random() * books.length)];
+            const res = await fetch(`https://www.sefaria.org/api/texts/${book}?random=1`);
+            const data = await res.json();
+            
+            let text = Array.isArray(data.text) ? data.text[0] : data.text;
+            if (!text || typeof text !== 'string') return null;
+
+            text = text.replace(/<[^>]*>?/gm, '');
+
+            // Quality filter for Sefaria data
+            if (text.length < 35 || text.includes("Chapter") || text.includes("Mishna")) return null;
+
+            return { text, ref: data.ref };
+        }
 
         async function generateVision() {
             const bg = document.getElementById('bg-image');
             const box = document.getElementById('quote-box');
             const load = document.getElementById('loader');
-            const qTxt = document.getElementById('quote-text');
-            const qSrc = document.getElementById('quote-source');
-
+            
             bg.style.opacity = 0;
             box.style.display = 'none';
             load.style.display = 'block';
-            load.innerText = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
 
-            try {
-                // Randomly pick a book to avoid the "same quote" loop
-                const book = categories[Math.floor(Math.random() * categories.length)];
-                const apiResponse = await fetch(`https://www.sefaria.org/api/texts/${book}?random=1`);
-                const data = await apiResponse.json();
+            let validQuote = null;
+            let attempts = 0;
 
-                let rawText = data.text || "Patience is a virtue.";
-                if (Array.isArray(rawText)) rawText = rawText[0]; 
-                const cleanText = rawText.replace(/<[^>]*>?/gm, ''); 
+            while (!validQuote && attempts < 15) {
+                validQuote = await fetchQuote();
+                attempts++;
+            }
 
-                const seed = Math.floor(Math.random() * 10000);
-                const imgUrl = `https://picsum.photos/seed/${seed}/1200/1800`;
+            if (!validQuote) validQuote = modernSages[0];
 
-                const tempImg = new Image();
-                tempImg.crossOrigin = "anonymous"; // CRITICAL FOR DOWNLOADS
-                tempImg.src = imgUrl;
-                tempImg.onload = () => {
-                    bg.style.backgroundImage = `url(${imgUrl})`;
-                    qTxt.innerText = `"${cleanText.toUpperCase()}"`;
-                    qSrc.innerText = `— ${data.ref}`;
+            const seed = Math.floor(Math.random() * 10000);
+            const imgUrl = `https://picsum.photos/seed/${seed}/1200/1800`;
 
-                    setTimeout(() => {
-                        load.style.display = 'none';
-                        box.style.display = 'block';
-                        bg.style.opacity = 1;
-                    }, 400);
-                };
-            } catch (error) {
-                qTxt.innerText = "THE SAGES ARE RESTING. TRY AGAIN.";
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.src = imgUrl;
+            img.onload = () => {
+                bg.style.backgroundImage = `url(${imgUrl})`;
+                document.getElementById('quote-text').innerText = `"${validQuote.text.toUpperCase()}"`;
+                document.getElementById('quote-source').innerText = `— ${validQuote.ref}`;
+                
                 load.style.display = 'none';
                 box.style.display = 'block';
-            }
+                bg.style.opacity = 1;
+            };
         }
 
         function downloadVision() {
             const area = document.getElementById('capture-area');
-            html2canvas(area, { useCORS: true, allowTaint: true }).then(canvas => {
+            html2canvas(area, { useCORS: true }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'GidsVision.png';
+                link.download = 'Wisdom.png';
                 link.href = canvas.toDataURL();
                 link.click();
             });
         }
 
-        window.addEventListener('keydown', e => { if(e.key.includes("Arrow")) generateVision(); });
         window.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
         window.addEventListener('touchend', e => { if (Math.abs(startX - e.changedTouches[0].clientX) > 60) generateVision(); });
-
         generateVision();
     </script>
 </body>
