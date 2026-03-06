@@ -5,71 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GIDS VISION | Unlimited Wisdom</title>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body, html { 
-            margin: 0; padding: 0; height: 100%; overflow: hidden; 
-            background: #000; font-family: 'Space Grotesk', sans-serif; 
-            touch-action: none; 
-        }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Space Grotesk', sans-serif; touch-action: none; }
         
-        #bg-image {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center;
-            transition: opacity 1s ease-in-out; opacity: 0;
-            background-color: #111;
-        }
-
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center; padding: 30px;
-            box-sizing: border-box;
-        }
-
-        #quote-box { max-width: 900px; width: 95%; }
+        #capture-area { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         
-        #quote-text {
-            font-family: 'Bangers', cursive; 
-            font-size: clamp(1.5rem, 6vw, 3.2rem); 
-            color: #fff;
-            text-shadow: 0 0 25px rgba(0,0,0,1); margin-bottom: 25px;
-            letter-spacing: 1px; line-height: 1.1;
-        }
+        #bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: opacity 1s; opacity: 0; background-color: #111; }
 
-        #quote-source { 
-            font-size: clamp(0.9rem, 4vw, 1.4rem); 
-            color: #4ade80; text-transform: uppercase; letter-spacing: 5px; 
-        }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px; box-sizing: border-box; }
 
-        .btn-refresh {
-            position: fixed; bottom: 50px;
-            background: #fff; color: #000; border: none; padding: 18px 45px;
-            font-family: 'Bangers'; font-size: 1.8rem; cursor: pointer;
-            border-radius: 60px; transition: 0.3s; z-index: 10;
-            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
-            -webkit-tap-highlight-color: transparent;
-        }
-        .btn-refresh:hover { transform: scale(1.05); background: #4ade80; }
-        
-        #loader { color: white; font-family: 'Bangers'; font-size: 2.2rem; letter-spacing: 3px; }
-        .hint { color: rgba(255,255,255,0.3); font-size: 0.7rem; margin-top: 30px; text-transform: uppercase; letter-spacing: 2px; }
+        #quote-box { max-width: 900px; width: 95%; z-index: 5; }
+        #quote-text { font-family: 'Bangers', cursive; font-size: clamp(1.5rem, 6vw, 3.2rem); color: #fff; text-shadow: 0 0 25px #000; margin-bottom: 25px; line-height: 1.1; }
+        #quote-source { font-size: clamp(0.9rem, 4vw, 1.4rem); color: #4ade80; text-transform: uppercase; letter-spacing: 5px; }
+
+        .controls { position: fixed; bottom: 30px; display: flex; gap: 15px; z-index: 100; }
+        .btn { background: #fff; color: #000; border: none; padding: 15px 30px; font-family: 'Bangers'; font-size: 1.4rem; cursor: pointer; border-radius: 50px; transition: 0.3s; box-shadow: 0 0 20px rgba(74, 222, 128, 0.5); }
+        .btn:hover { transform: scale(1.1); background: #4ade80; }
+        .btn-dl { background: #4ade80; color: #000; }
+
+        #loader { color: white; font-family: 'Bangers'; font-size: 2.2rem; letter-spacing: 2px; text-align: center; z-index: 10; }
     </style>
 </head>
 <body>
 
-    <div id="bg-image"></div>
-    
-    <div class="overlay">
-        <div id="loader">FETCHING FROM SEFARIA...</div>
-        <div id="quote-box" style="display:none;">
-            <div id="quote-text"></div>
-            <div id="quote-source"></div>
-            <div class="hint">Swipe or use Arrow Keys</div>
+    <div id="capture-area">
+        <div id="bg-image"></div>
+        <div class="overlay">
+            <div id="loader">WAKING THE SAGES...</div>
+            <div id="quote-box" style="display:none;">
+                <div id="quote-text"></div>
+                <div id="quote-source"></div>
+            </div>
         </div>
-        <button class="btn-refresh" onclick="generateVision()">NEW VISION</button>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="generateVision()">NEXT</button>
+        <button class="btn btn-dl" onclick="downloadVision()">DOWNLOAD</button>
     </div>
 
     <script>
+        const loadingMessages = [
+            "WAKING UP THE SAGES...",
+            "POLISHING THE CROWN...",
+            "CONSULTING THE ANCIENTS...",
+            "UNROLLING THE SCROLLS...",
+            "SEARCHING FOR MEANING...",
+            "GATHERING KAVANAH...",
+            "SAGES ARE THINKING...",
+            "OPENING THE GATES..."
+        ];
+
+        // Wide list of books to ensure variety
+        const categories = ["Pirkei_Avot", "Psalms", "Proverbs", "Ecclesiastes"];
         let startX = 0;
 
         async function generateVision() {
@@ -79,64 +68,59 @@
             const qTxt = document.getElementById('quote-text');
             const qSrc = document.getElementById('quote-source');
 
-            // 1. START LOADING STATE
             bg.style.opacity = 0;
             box.style.display = 'none';
             load.style.display = 'block';
+            load.innerText = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
 
             try {
-                // 2. API CALL: Fetch a random teaching from Pirkei Avot
-                const apiResponse = await fetch('https://www.sefaria.org/api/texts/Pirkei_Avot?random=1');
+                // Randomly pick a book to avoid the "same quote" loop
+                const book = categories[Math.floor(Math.random() * categories.length)];
+                const apiResponse = await fetch(`https://www.sefaria.org/api/texts/${book}?random=1`);
                 const data = await apiResponse.json();
 
-                // 3. DATA CLEANING: Strip HTML tags and handle arrays
-                let rawText = data.text || "Wisdom is seeking.";
+                let rawText = data.text || "Patience is a virtue.";
                 if (Array.isArray(rawText)) rawText = rawText[0]; 
                 const cleanText = rawText.replace(/<[^>]*>?/gm, ''); 
 
-                // 4. IMAGE CALL: Get a random nature/landscape photo
-                const seed = Math.floor(Math.random() * 5000);
+                const seed = Math.floor(Math.random() * 10000);
                 const imgUrl = `https://picsum.photos/seed/${seed}/1200/1800`;
 
-                // 5. PRE-LOAD IMAGE
                 const tempImg = new Image();
+                tempImg.crossOrigin = "anonymous"; // CRITICAL FOR DOWNLOADS
                 tempImg.src = imgUrl;
                 tempImg.onload = () => {
                     bg.style.backgroundImage = `url(${imgUrl})`;
                     qTxt.innerText = `"${cleanText.toUpperCase()}"`;
-                    qSrc.innerText = `— ${data.ref}`; // Sefaria citation
+                    qSrc.innerText = `— ${data.ref}`;
 
                     setTimeout(() => {
                         load.style.display = 'none';
                         box.style.display = 'block';
                         bg.style.opacity = 1;
-                    }, 300);
+                    }, 400);
                 };
             } catch (error) {
-                console.error("API Error:", error);
-                qTxt.innerText = "COULD NOT CONNECT TO THE SAGES.";
+                qTxt.innerText = "THE SAGES ARE RESTING. TRY AGAIN.";
                 load.style.display = 'none';
                 box.style.display = 'block';
             }
         }
 
-        // --- INTERACTIVE CONTROLS ---
-        
-        // Key listener for PC
-        window.addEventListener('keydown', e => { 
-            if(e.key.includes("Arrow")) generateVision(); 
-        });
-        
-        // Touch listener for Mobile
-        window.addEventListener('touchstart', e => { 
-            startX = e.touches[0].clientX; 
-        });
-        window.addEventListener('touchend', e => {
-            const endX = e.changedTouches[0].clientX;
-            if (Math.abs(startX - endX) > 60) generateVision();
-        });
+        function downloadVision() {
+            const area = document.getElementById('capture-area');
+            html2canvas(area, { useCORS: true, allowTaint: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'GidsVision.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
 
-        // Run on Startup
+        window.addEventListener('keydown', e => { if(e.key.includes("Arrow")) generateVision(); });
+        window.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+        window.addEventListener('touchend', e => { if (Math.abs(startX - e.changedTouches[0].clientX) > 60) generateVision(); });
+
         generateVision();
     </script>
 </body>
