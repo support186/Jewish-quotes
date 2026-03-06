@@ -3,55 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GIDS VISION | Jewish Wisdom</title>
+    <title>GIDS VISION | Unlimited Wisdom</title>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <style>
         body, html { 
             margin: 0; padding: 0; height: 100%; overflow: hidden; 
             background: #000; font-family: 'Space Grotesk', sans-serif; 
-            touch-action: none; /* Prevents default browser pull-to-refresh */
+            touch-action: none; 
         }
         
         #bg-image {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-size: cover; background-position: center;
-            transition: opacity 0.8s ease-in-out; opacity: 0;
+            transition: opacity 1s ease-in-out; opacity: 0;
             background-color: #111;
         }
 
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.65); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center; padding: 20px;
+            background: rgba(0,0,0,0.7); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center; padding: 30px;
             box-sizing: border-box;
         }
 
-        #quote-box { max-width: 850px; width: 90%; transition: opacity 0.5s ease; }
+        #quote-box { max-width: 900px; width: 95%; }
         
         #quote-text {
             font-family: 'Bangers', cursive; 
-            font-size: clamp(1.8rem, 8vw, 3.5rem); /* Responsive font sizing */
+            font-size: clamp(1.5rem, 6vw, 3.2rem); 
             color: #fff;
-            text-shadow: 0 0 20px rgba(0,0,0,1); margin-bottom: 20px;
-            letter-spacing: 1px; line-height: 1.2;
+            text-shadow: 0 0 25px rgba(0,0,0,1); margin-bottom: 25px;
+            letter-spacing: 1px; line-height: 1.1;
         }
 
         #quote-source { 
-            font-size: clamp(0.9rem, 4vw, 1.3rem); 
-            color: #4ade80; text-transform: uppercase; letter-spacing: 4px; 
+            font-size: clamp(0.9rem, 4vw, 1.4rem); 
+            color: #4ade80; text-transform: uppercase; letter-spacing: 5px; 
         }
 
         .btn-refresh {
-            position: fixed; bottom: 40px;
-            background: #fff; color: #000; border: none; padding: 15px 35px;
-            font-family: 'Bangers'; font-size: 1.6rem; cursor: pointer;
-            border-radius: 50px; transition: 0.3s; z-index: 10;
-            box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
+            position: fixed; bottom: 50px;
+            background: #fff; color: #000; border: none; padding: 18px 45px;
+            font-family: 'Bangers'; font-size: 1.8rem; cursor: pointer;
+            border-radius: 60px; transition: 0.3s; z-index: 10;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
             -webkit-tap-highlight-color: transparent;
         }
+        .btn-refresh:hover { transform: scale(1.05); background: #4ade80; }
         
-        #loader { color: white; font-family: 'Bangers'; font-size: 2rem; letter-spacing: 2px; }
-        .hint { color: rgba(255,255,255,0.4); font-size: 0.7rem; margin-top: 20px; text-transform: uppercase; }
+        #loader { color: white; font-family: 'Bangers'; font-size: 2.2rem; letter-spacing: 3px; }
+        .hint { color: rgba(255,255,255,0.3); font-size: 0.7rem; margin-top: 30px; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
 <body>
@@ -59,83 +60,83 @@
     <div id="bg-image"></div>
     
     <div class="overlay">
-        <div id="loader">CONSULTING THE SAGES...</div>
+        <div id="loader">FETCHING FROM SEFARIA...</div>
         <div id="quote-box" style="display:none;">
             <div id="quote-text"></div>
             <div id="quote-source"></div>
-            <div class="hint">Swipe or use Arrows to navigate</div>
+            <div class="hint">Swipe or use Arrow Keys</div>
         </div>
-        <button class="btn-refresh" onclick="generateVision()">NEXT</button>
+        <button class="btn-refresh" onclick="generateVision()">NEW VISION</button>
     </div>
 
     <script>
-        const jewishQuotes = [
-            { text: "If I am not for myself, who will be for me? And if I am only for myself, what am I?", source: "Hillel the Elder" },
-            { text: "A little bit of light dispels a lot of darkness.", source: "Chassidic Saying" },
-            { text: "The world is a very narrow bridge; the important thing is not to be afraid.", source: "Rabbi Nachman of Breslov" },
-            { text: "Who is wise? One who learns from every person.", source: "Pirkei Avot" },
-            { text: "You are not obligated to complete the work, but neither are you free to desist from it.", source: "Rabbi Tarfon" },
-            { text: "Say little and do much.", source: "Shammai" },
-            { text: "Who is rich? One who is happy with their portion.", source: "Mishna" },
-            { text: "Don't look at the flask, but at what is inside it.", source: "Pirkei Avot" },
-            { text: "The reward for a mitzvah is the mitzvah itself.", source: "Ben Azzai" }
-        ];
-
-        let currentIdx = -1;
-        let touchStartX = 0;
+        let startX = 0;
 
         async function generateVision() {
-            const bgContainer = document.getElementById('bg-image');
-            const quoteBox = document.getElementById('quote-box');
-            const loader = document.getElementById('loader');
-            const quoteText = document.getElementById('quote-text');
-            const quoteSource = document.getElementById('quote-source');
+            const bg = document.getElementById('bg-image');
+            const box = document.getElementById('quote-box');
+            const load = document.getElementById('loader');
+            const qTxt = document.getElementById('quote-text');
+            const qSrc = document.getElementById('quote-source');
 
-            bgContainer.style.opacity = 0;
-            quoteBox.style.opacity = 0;
-            loader.style.display = 'block';
+            // 1. START LOADING STATE
+            bg.style.opacity = 0;
+            box.style.display = 'none';
+            load.style.display = 'block';
 
-            let nextIdx;
-            do { nextIdx = Math.floor(Math.random() * jewishQuotes.length); } while (nextIdx === currentIdx);
-            currentIdx = nextIdx;
-            const selection = jewishQuotes[currentIdx];
+            try {
+                // 2. API CALL: Fetch a random teaching from Pirkei Avot
+                const apiResponse = await fetch('https://www.sefaria.org/api/texts/Pirkei_Avot?random=1');
+                const data = await apiResponse.json();
 
-            const randomSeed = Math.floor(Math.random() * 1000);
-            const imageUrl = `https://picsum.photos/seed/${randomSeed}/1200/1800`; // Portrait-friendly for mobile
+                // 3. DATA CLEANING: Strip HTML tags and handle arrays
+                let rawText = data.text || "Wisdom is seeking.";
+                if (Array.isArray(rawText)) rawText = rawText[0]; 
+                const cleanText = rawText.replace(/<[^>]*>?/gm, ''); 
 
-            const img = new Image();
-            img.src = imageUrl;
-            img.onload = () => {
-                bgContainer.style.backgroundImage = `url(${imageUrl})`;
-                quoteText.innerText = `"${selection.text.toUpperCase()}"`;
-                quoteSource.innerText = `— ${selection.source}`;
+                // 4. IMAGE CALL: Get a random nature/landscape photo
+                const seed = Math.floor(Math.random() * 5000);
+                const imgUrl = `https://picsum.photos/seed/${seed}/1200/1800`;
 
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    quoteBox.style.display = 'block';
-                    quoteBox.style.opacity = 1;
-                    bgContainer.style.opacity = 1;
-                }, 400);
-            };
+                // 5. PRE-LOAD IMAGE
+                const tempImg = new Image();
+                tempImg.src = imgUrl;
+                tempImg.onload = () => {
+                    bg.style.backgroundImage = `url(${imgUrl})`;
+                    qTxt.innerText = `"${cleanText.toUpperCase()}"`;
+                    qSrc.innerText = `— ${data.ref}`; // Sefaria citation
+
+                    setTimeout(() => {
+                        load.style.display = 'none';
+                        box.style.display = 'block';
+                        bg.style.opacity = 1;
+                    }, 300);
+                };
+            } catch (error) {
+                console.error("API Error:", error);
+                qTxt.innerText = "COULD NOT CONNECT TO THE SAGES.";
+                load.style.display = 'none';
+                box.style.display = 'block';
+            }
         }
 
-        // --- COMPUTER CONTROLS ---
-        window.addEventListener('keydown', (e) => {
-            if (e.key === "ArrowRight" || e.key === "ArrowLeft") generateVision();
+        // --- INTERACTIVE CONTROLS ---
+        
+        // Key listener for PC
+        window.addEventListener('keydown', e => { 
+            if(e.key.includes("Arrow")) generateVision(); 
+        });
+        
+        // Touch listener for Mobile
+        window.addEventListener('touchstart', e => { 
+            startX = e.touches[0].clientX; 
+        });
+        window.addEventListener('touchend', e => {
+            const endX = e.changedTouches[0].clientX;
+            if (Math.abs(startX - endX) > 60) generateVision();
         });
 
-        // --- MOBILE SWIPE CONTROLS ---
-        window.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, false);
-
-        window.addEventListener('touchend', e => {
-            let touchEndX = e.changedTouches[0].screenX;
-            if (Math.abs(touchEndX - touchStartX) > 50) { // Swipe threshold
-                generateVision();
-            }
-        }, false);
-
+        // Run on Startup
         generateVision();
     </script>
 </body>
